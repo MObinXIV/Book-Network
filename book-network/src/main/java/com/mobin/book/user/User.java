@@ -1,6 +1,8 @@
 package com.mobin.book.user;
 
+import com.mobin.book.book.Book;
 import com.mobin.book.common.BaseAuditingEntity;
+import com.mobin.book.history.BookTransactionHistory;
 import com.mobin.book.role.Role;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,13 +20,7 @@ import java.util.stream.Collectors;
         @UniqueConstraint(name = "user_unique_email", columnNames = "email") // Ensures email uniqueness in the database
 })
 public class User extends BaseAuditingEntity implements UserDetails, Principal {
-    public List<Role> getRoles() {
-        return roles;
-    }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -66,13 +62,16 @@ public class User extends BaseAuditingEntity implements UserDetails, Principal {
 
      private List<Role> roles;
 
+    @OneToMany(mappedBy = "owner")
+    private List<Book> books;
+    @OneToMany(mappedBy = "user")
+    private List<BookTransactionHistory> histories;
+
 
     public User() {
     }
 
-    public User(LocalDateTime createdDate, LocalDateTime lastModifiedDate, UUID id, String firstName, String lastName,
-                LocalDateTime dateOfBirth, String email, String password, boolean accountLocked, boolean enabled,
-                List<Role> roles) {
+    public User(LocalDateTime createdDate, LocalDateTime lastModifiedDate, UUID id, String firstName, String lastName, LocalDateTime dateOfBirth, String email, String password, boolean accountLocked, boolean enabled, List<Role> roles, List<Book> books, List<BookTransactionHistory> histories) {
         super(createdDate, lastModifiedDate);
         this.id = id;
         this.firstName = firstName;
@@ -83,7 +82,11 @@ public class User extends BaseAuditingEntity implements UserDetails, Principal {
         this.accountLocked = accountLocked;
         this.enabled = enabled;
         this.roles = roles;
+        this.books = books;
+        this.histories = histories;
     }
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
@@ -184,5 +187,26 @@ public class User extends BaseAuditingEntity implements UserDetails, Principal {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+    public List<Role> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
+    public List<BookTransactionHistory> getHistories() {
+        return histories;
+    }
+
+    public void setHistories(List<BookTransactionHistory> histories) {
+        this.histories = histories;
     }
 }
