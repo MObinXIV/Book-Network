@@ -67,7 +67,6 @@ public class User extends BaseAuditingEntity implements UserDetails, Principal {
     @OneToMany(mappedBy = "user")
     private List<BookTransactionHistory> histories;
 
-
     public User() {
     }
 
